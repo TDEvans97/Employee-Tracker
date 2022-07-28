@@ -1,7 +1,6 @@
 const { prompt } = require("inquirer");
 const titleart = require("asciiart-logo");
-// const db = require("./db");
-// require("console.table");
+const db = require("./db/connection");
 
 init();
 
@@ -47,10 +46,6 @@ function mainMenu() {
                 {
                     name: "Add A Department",
                     value: "ADD_DEPARTMENT"
-                },
-                {
-                    name: "Quit",
-                    value: "QUIT"
                 }
             ]
         }
@@ -59,29 +54,90 @@ function mainMenu() {
         let choice = res.choice;
         switch (choice) {
             case "VIEW_EMPLOYEES":
-                //function();
+                viewEmployees();
                 break;
             case "ADD_EMPLOYEE":
-                //function();
+                addEmployee();
                 break;
             case "UPDATE_EMPLOYEE_ROLE":
                 //function();
                 break;
             case "VIEW_ROLES":
-                //function();
+                viewRoles();
                 break;
             case "ADD_ROLE":
                 //function();
                 break;
             case "VIEW_DEPARTMENTS":
-                //function();
+                viewDepartments();
                 break;
             case "ADD_DEPARTMENT":
-                //function();
-                break;
-            case "QUIT":
                 //function();
                 break;
         }
     })
 }
+
+function viewEmployees() {
+    db.query('SELECT * FROM employee', (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res)
+        mainMenu(); // Return to main menu after rendering table
+    })
+};
+
+function viewRoles() {
+    db.query('SELECT role.title AS Title, role.salary AS Salary FROM role', (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res)
+        mainMenu();
+    })
+};
+
+function viewDepartments() {
+    db.query('SELECT * FROM department', (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.table(res)
+        mainMenu();
+    })
+};
+
+function addEmployee() {
+    prompt([
+        {
+            type: "input",
+            name: "first",
+            message: "What is the employee's first name?"
+        },
+        {
+            type: "input",
+            name: "last",
+            message: "What is the employee's last name?"
+        },
+        {
+            type: "input",
+            name: "role",
+            message: "What is the employee's role id?"
+        },
+        {
+            type: "input",
+            name: "manager",
+            message: "What is the employee's manager's id?"
+        }
+    ]).then(answers => {
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+        VALUES (${answers.first}, ${answers.last}, ${answers.role}, ${answers.manager})`, (err, res) => {
+            if (err) {
+                throw err;
+            }
+            console.table(res)
+            mainMenu();
+        })
+    })
+};

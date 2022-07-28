@@ -76,7 +76,7 @@ function mainMenu() {
                 break;
         }
     })
-}
+};
 
 function viewEmployees() {
     db.query('SELECT * FROM employee', (err, res) => {
